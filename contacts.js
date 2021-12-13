@@ -4,49 +4,48 @@ const uniqid = require("uniqid");
 
 const contactsPath = path.join(__dirname, "db/contacts.json");
 
-// TODO: задокументировать каждую функцию
-async function listContacts() {
-  try {
-    const contactsList = await fs.readFile(contactsPath);
-    return JSON.parse(contactsList);
-  } catch (error) {
-    console.log(error);
-  }
+function listContacts() {
+  fs.readFile(contactsPath, "utf-8")
+    .then((data) => console.table(JSON.parse(data)))
+    .catch((error) => console.error(error));
 }
 
-async function getContactById(contactId) {
-  try {
-    const contacts = await listContacts();
-    return (contactById = contacts.find((item) => item.id === contactId));
-  } catch (error) {
-    console.log(error);
-  }
+function getContactById(contactId) {
+  fs.readFile(contactsPath, "utf-8")
+    .then((data) => {
+      const contactsById = JSON.parse(data).find(
+        (item) => item.id === contactId
+      );
+      console.table(contactsById);
+    })
+    .catch((error) => console.error(error));
 }
 
-async function removeContact(contactId) {
-  try {
-    const contacts = await listContacts();
-    const deleteContact = contacts.filter((item) => item.id !== contactId);
-    const newFile = fs.writeFile(contactsPath, deleteContact);
-    return newFile;
-  } catch (error) {
-    console.log(error);
-  }
+function removeContact(contactId) {
+  fs.readFile(contactsPath, "utf-8")
+    .then((data) => {
+      const deletedContact = JSON.parse(data).filter(
+        (item) => item.id !== contactId
+      );
+      console.table(deletedContact);
+    })
+    .catch((error) => console.error(error));
 }
 
-async function addContact(name, email, phone) {
-  try {
-    const contacts = await listContacts();
-    const addContact = fs.appendFile([...contacts], {
-      id: uniqid(),
-      name,
-      email,
-      phone,
-    });
-    return addContact;
-  } catch (error) {
-    console.log(error);
-  }
+function addContact(name, email, phone) {
+  fs.readFile(contactsPath, "utf-8")
+    .then((data) => {
+      const contactList = JSON.parse(data);
+      contactList.push({
+        id: uniqid(),
+        name,
+        email,
+        phone,
+      });
+      fs.writeFile(contactsPath, JSON.stringify(contactList));
+      console.table(contactList);
+    })
+    .catch((error) => console.error(error));
 }
 
 module.exports = {
